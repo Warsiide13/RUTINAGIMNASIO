@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutina 80 Min - Noe</title>
+    <style>
+        :root {
+            --primary: #e63946;
+            --secondary: #1d3557;
+            --accent: #457b9d;
+            --bg: #f1faee;
+            --dark: #1d1d1d;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--dark);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            color: var(--white);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .day-card {
+            background: var(--white);
+            padding: 12px 5px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            font-weight: bold;
+            font-size: 0.85em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .day-card.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .routine-section {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h2 { color: var(--secondary); margin-top: 0; border-bottom: 2px solid var(--primary); display: inline-block; }
+        
+        .warmup-box {
+            background: #fff0f0;
+            padding: 15px;
+            border-left: 5px solid var(--primary);
+            margin: 15px 0;
+            border-radius: 5px;
+            font-size: 0.95em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        th { background: #f8f9fa; font-size: 0.75em; text-transform: uppercase; color: #666; }
+
+        .video-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.8em;
+            display: block;
+            margin-top: 4px;
+            font-weight: bold;
+        }
+
+        .video-link:hover { text-decoration: underline; }
+
+        .timer-info {
+            margin-top: 25px;
+            font-size: 0.85em;
+            color: #555;
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .rest-day {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        @media (max-width: 400px) {
+            .schedule-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1 style="margin:0; font-size: 1.5em;">ENTRENAMIENTO NOE</h1>
+        <p style="margin:5px 0 0; opacity: 0.9;">80 Minutos • Máquinas • Intenso</p>
+    </header>
+
+    <div class="schedule-grid" id="dayPicker">
+        <div class="day-card" onclick="showRoutine('Lunes')">LUN</div>
+        <div class="day-card" onclick="showRoutine('Martes')">MAR</div>
+        <div class="day-card" onclick="showRoutine('Miercoles')">MIE</div>
+        <div class="day-card" onclick="showRoutine('Jueves')">JUE</div>
+        <div class="day-card" onclick="showRoutine('Viernes')">VIE</div>
+        <div class="day-card" onclick="showRoutine('Sabado')">SAB</div>
+        <div class="day-card" onclick="showRoutine('Domingo')">DOM</div>
+    </div>
+
+    <div id="routineDisplay" class="routine-section">
+        <!-- Contenido dinámico -->
+    </div>
+</div>
+
+<script>
+    const ytBase = "https://www.youtube.com/results?search_query=";
+
+    const routines = {
+        'Lunes': {
+            title: 'PECHO',
+            warmup: '10m movilidad hombros + 2x20 press máquina sin peso.',
+            exercises: [
+                { name: 'Press de Pecho Máquina', s: 4, r: '8-10', d: '90s' },
+                { name: 'Press Inclinado en Smith', s: 4, r: '10-12', d: '90s' },
+                { name: 'Peck Deck (Aperturas)', s: 3, r: '15', d: '60s' },
+                { name: 'Cruce de Poleas', s: 3, r: 'Fallo', d: '60s' }
+            ]
+        },
+        'Martes': {
+            title: 'ESPALDA',
+            warmup: '10m movilidad + Jalón al pecho ligero.',
+            exercises: [
+                { name: 'Jalón al Pecho', s: 4, r: '10-12', d: '90s' },
+                { name: 'Remo en Máquina Sentado', s: 4, r: '10', d: '90s' },
+                { name: 'Pull-over en Polea Alta', s: 3, r: '15', d: '60s' },
+                { name: 'Remo Unilateral Máquina', s: 3, r: '12', d: '60s' }
+            ]
+        },
+        'Miercoles': { title: 'DESCANSO REPARADOR', isRest: true },
+        'Jueves': {
+            title: 'HOMBRO',
+            warmup: '10m rotadores + Laterales con mancuerna 2kg.',
+            exercises: [
+                { name: 'Press Militar Máquina', s: 4, r: '10', d: '90s' },
+                { name: 'Laterales en Polea', s: 4, r: '15', d: '60s' },
+                { name: 'Pájaro Deltoide Posterior', s: 4, r: '15', d: '60s' },
+                { name: 'Encogimientos en Smith', s: 3, r: '12', d: '60s' }
+            ]
+        },
+        'Viernes': {
+            title: 'BRAZOS (B/T)',
+            warmup: 'Movilidad de codos y muñecas.',
+            exercises: [
+                { name: 'Extensión Tríceps Polea', s: 4, r: '12-15', d: '60s' },
+                { name: 'Curl Bíceps en Máquina', s: 4, r: '12', d: '60s' },
+                { name: 'Press Francés en Smith', s: 3, r: '10', d: '60s' },
+                { name: 'Curl Martillo Polea', s: 3, r: '12', d: '60s' }
+            ]
+        },
+        'Sabado': {
+            title: 'PIERNA (Intenso)',
+            warmup: '10m movilidad + 2x20 Extensiones ligeras.',
+            exercises: [
+                { name: 'Prensa de Piernas', s: 4, r: '10-12', d: '120s' },
+                { name: 'Hack Squat', s: 3, r: '10', d: '120s' },
+                { name: 'Curl Femoral Tumbado', s: 4, r: '12', d: '90s' },
+                { name: 'Extensiones Cuádriceps', s: 3, r: '15', d: '90s' },
+                { name: 'Pantorrilla en Prensa', s: 4, r: '20', d: '60s' }
+            ]
+        },
+        'Domingo': { title: 'DESCANSO TOTAL', isRest: true }
+    };
+
+    function showRoutine(day) {
+        const cards = document.querySelectorAll('.day-card');
+        cards.forEach(c => c.classList.remove('active'));
+        
+        // Manejar el clic manual y la carga inicial
+        const target = event ? event.currentTarget : document.querySelector(`.day-card:nth-child(${['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo'].indexOf(day)+1})`);
+        target.classList.add('active');
+
+        const display = document.getElementById('routineDisplay');
+        const data = routines[day];
+
+        if (data.isRest) {
+            display.innerHTML = `<div class="rest-day"><h2>${data.title}</h2><p>Recuperación necesaria para progresar. ¡A recargar!</p></div>`;
+            return;
+        }
+
+        let tableRows = data.exercises.map(ex => `
+            <tr>
+                <td>
+                    <strong>${ex.name}</strong>
+                    <a href="${ytBase + encodeURIComponent(ex.name + ' tecnica gym')}" target="_blank" class="video-link">Ver técnica 🎥</a>
+                </td>
+                <td style="text-align:center">${ex.s}</td>
+                <td style="text-align:center">${ex.r}</td>
+                <td style="text-align:center">${ex.d}</td>
+            </tr>
+        `).join('');
+
+        display.innerHTML = `
+            <h2>Día de ${data.title}</h2>
+            <div class="warmup-box">
+                <strong>Calentamiento:</strong> ${data.warmup}
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ejercicio</th>
+                        <th style="text-align:center">S</th>
+                        <th style="text-align:center">R</th>
+                        <th style="text-align:center">D</th>
+                    </tr>
+                </thead>
+                <tbody>${tableRows}</tbody>
+            </table>
+            <div class="timer-info">
+                ⏱️ <strong>Meta:</strong> 80 min. totales. Descansos estrictos.
+            </div>
+        `;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        showRoutine('Lunes');
+    });
+</script>
+
+</body>
+</html>
